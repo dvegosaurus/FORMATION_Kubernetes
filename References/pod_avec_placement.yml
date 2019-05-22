@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: pod_avec_placement
+spec:
+    containers:
+      -name: web
+      image: nginx:alpine
+      imagePullPolicy: IfNotPresent
+    nodeSelector:
+      carte_encodeur: ZB1245

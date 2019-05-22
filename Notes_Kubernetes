@@ -8,6 +8,8 @@
             - attention au '!' qui est spécial en bash donc on l'echappe avec '\'
             - match -> get nodes --selector beta.kubernetes.io/arch=amd64
         - i.e. = Kubectl get deploy,rs,po --show-labels --selector run==serveurweb
+        - i.e.2 = kubectl get deploy,rs,po -o wide -l run=essup
+
 -- Activer l'autocomplétion :
     - . <(kubectl completion bash)
     - "." -> équivalent de la commande source
@@ -23,6 +25,8 @@
             - kubectl get all 
             - kubectl get all -o wide
                 - '-o' pour le formatage (-o wide, -o json)
+                - get all affiche n'affiche pas les PODS du namespace system
+                    - kubectl get all --all-namespaces (pour tout voir)
 
 #### communication "dans" un pod (ici page web nginx) :
 - kubectl get all -> pour trouver l'ip d'un POD
@@ -41,10 +45,97 @@
         - kubectl run autreserveurweb --image=nginx:alpine --replicas=6
 
 #### Création a partir d'un fichier de conf :
+yaml ref. : https://github.com/dvegosaurus/FORMATION_Kubernetes/blob/master/References/pod_avec_gardefou.yml
 -- Validation du fichier :
     - kubectl create -f <path to yaml>l --validate --dry-run 
 -- Creation : 
-    - kubectl create -f <path to yaml>
+    - kubectl create -f <path to yaml>
+
+#### voir la conf d'un déploiement 
+-- kubectl describe deployment essup
+ - result :
+        Name:                   essup
+        Namespace:              default
+        CreationTimestamp:      Wed, 22 May 2019 16:03:59 +0200
+        Labels:                 run=essup
+        Annotations:            deployment.kubernetes.io/revision: 1
+        Selector:               run=essup
+        Replicas:               15 desired | 15 updated | 15 total | 15 available | 0 unavailable
+        StrategyType:           RollingUpdate
+        MinReadySeconds:        0
+        RollingUpdateStrategy:  25% max unavailable, 25% max surge
+        Pod Template:
+        Labels:  run=essup
+        Containers:
+        essup:
+            Image:        askcarter/hello:1.0.0
+            Port:         <none>
+            Host Port:    <none>
+            Environment:  <none>
+            Mounts:       <none>
+        Volumes:        <none>
+        Conditions:
+        Type           Status  Reason
+        ----           ------  ------
+        Available      True    MinimumReplicasAvailable
+        Progressing    True    NewReplicaSetAvailable
+        OldReplicaSets:  <none>
+        NewReplicaSet:   essup-68977c8f48 (15/15 replicas created)
+        Events:
+        Type    Reason             Age    From                   Message
+        ----    ------             ----   ----                   -------
+        Normal  ScalingReplicaSet  8m23s  deployment-controller  Scaled up replica set essup-68977c8f48 to 15
+
+#### update deployement
+-- kubectl set image deploy/essup essup=askcarter/hello:2.0.0
+    - deploy/essup -> nom du déploiement
+    - essu=askcarter/hello:2.0.0 -> nom du Container
+-- rollout :
+    - kubectl set image deploy/essup essup=askcarter/hello:2.0.0
+    - attention : undo / redo :
+        - pas possible de faire v3 puis v2 puis v1
+        - on fait v2, v1, v2, v1
+
+####  namespace
+-- show pods by namespace :
+    - kubectl get all --all-namespaces -> affiche le contenu de tout les namespaces
+    - kubectl get all -n kube-system -> cible un namespace
+-- create namespace :
+    - kubectl create ns <namespace name>
+-- run POD in a specific namespace :
+    - kubectl run serveurweb --image=nginx:alpine --replicas=3 -n <namespace name>
+-- set default namespace :
+    - kubectl config set-context --current --namespace=<namespace name>
+-- back to default conf :
+    - kubectl config set-context --current
+-- deleting a namespace :
+    - kubectl delete ns preprod
+    - !!! Pas de confirmation, pas de backup !!!
+    - détruit tout les PODS
+
+#### kubectl context
+-- kubectl config view
+ - result : (see ref. folder)
+
+#### labels :
+-- show label :
+    - kubectl get nodes <nodename> --show-labels
+-- set label :
+    - kubectl label nodes <nodename> <label_name>=<label_value>
+        - permet de créer un label
+    - kubectl label nodes node2 carte_encodeur=ZB1245 toto=azerty
+        - set multiple label
+-- change label value :
+    - kubectl label nodes <nodename> <label_name>=<label_value> --overwrite
+        - replace 
+    - kubectl label nodes <nodename> <label_name>= --overwrite
+        - clear 
+    - kubectl label nodes <nodename> <label_name>-
+        -delete (append '-' to the label_name)
+
+
+
+
 
 
 

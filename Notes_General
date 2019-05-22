@@ -5,6 +5,7 @@ Node        : une machine du cluster (master ou node/worker)
 Pod         : contient un ou des conteneurs docker
 Déploiement : contient des Pods
 Service     : contient des déploiements
+Namespace   : espace de nommage, isole des noms de ressources
 
 
 ##### Notes ##### :
@@ -49,11 +50,30 @@ Service     : contient des déploiements
         - Pas de déplacement des PODS entre Node :
             - ajout d'un node n'entraine pas le réequilbrage
                 - reste vide jusqu'a ce que un ou des POD démarre
+
+-- Updates des PODS :
+    - rolling updates :
+        - update les pods progressivement :
+            - seuil "unavailable" : poucentage d'indisponibilité toléré pendant MaJ   (i.e. 75% de POD)      
+            - seuil "Surge" : pourcentage de dépassement autorisé (i.e. 125% de POD)
+
+-- suppression des PODS :
+    - on ne supprime pas un POD mais un déploiement    
+
+-- Namespace :
+    - par défaut 4 Namespace :
+        - default
+        - public
+        - system
+    - permet d'isoler des ressources :
+        - i.e. : 2 container avec le meme nom, d
+
 -- Labels :
     - peuvent etre utilisé 
         - pour filtrer les resultat d'un Kubectl get
         - pour restreindre des pods a certains nodes 
- 
+    - ne pas utiliser de terme trop spécifique (plus souple, les technos évoluent) :
+        - i.e. : type de stockage rapide plutot que SSD 
 -- Vagrant :
     - Infra as code pour déploiement de VM
 
@@ -83,7 +103,7 @@ source (Vagrantfile) : https://github.com/sciabarracom/Mosaico3/blob/master/serv
                 - meme IP pour chaque VM, utilisé pour du NAT et sortir sur le web
             - 2/ Enpos08 : 10.0.0.x/24 
                 - pluggué sur vswitch en bridge (réseau 'kube')
-                
+
 ##### Unix command ######### :
 -- Vagrant local repo :
     - vagrant box add ubuntu/xenial64 file:///home/ib/Téléchargements/virtualbox.box-aka_ubuntu_xenial64 
