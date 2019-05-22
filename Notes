@@ -1,0 +1,19 @@
+ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
+
+-- Kubernetes : 
+    - apport du HA a docker
+    - capacité de déployer sur plusieurs machines
+
+-- Vagrant :
+    - Infra as code pour déploiement de VM
+
+
+
+
+
+##### Unix command ######### :
+
+-- Vagrant local repo :
+    - vagrant box add ubuntu/xenial64 file:///home/ib/Téléchargements/virtualbox.box-aka_ubuntu_xenial64 
+-- Run bash script from string :
+    - sudo bash -c "echo 127.0.0.1 master node1 node2 node3 >> /etc/hosts"
