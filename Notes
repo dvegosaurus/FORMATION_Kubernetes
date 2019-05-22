@@ -1,5 +1,13 @@
 ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
 
+##### Lexique ##### :
+Node        : une machine du cluster (master ou node/worker)
+Pod         : contient un ou des conteneurs docker
+Déploiement : contient des Pods
+Service     : contient des déploiements
+
+
+##### Notes ##### :
 -- Mosaico3 :
     - attention : les versions Docker et Kubernetes ne sont pas figées
 
@@ -20,6 +28,28 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
         - weave : réseau
         - apiserver : api result
             - kubectl est simplement un client pour apiserver
+    - Par défaut un master node n'héberge pas de docker autre que ceux dont il a besoin :
+        - pas de docker grafana, wordpress ...
+        - juste les docker fonctionnel (réseaux, api Kubernetes)
+    - Un POD = 2 conteneur au minimun :
+        - l'application (i.e. nginx)
+        - un docker "pilote"
+
+-- Pods :
+    - contient un ou des conteneurs docker
+    - Kubernetes ne gere pas des conteneur mais des Pods
+    - 1 PODS a une 1 adresse IP dans un VLAN dédié (interne au cluster)
+    - les conteneurs d'un POD sont sur le meme node
+    - on peut multiplier un POD pour la scalabilité
+        - kubectl scale deploy/<nom du deployment> --replicas=5 
+        - les nodes téléchargent leurs images docker indépendemment
+            - donc si repo spécifique, a configurer sur chaque node
+        - l'equilibrage de charge se fait sans tenir compte de la charge
+            - Nbr. de Pod / Nombre de Nod (10 POD / 3 serveurs = 3,3,4)
+        - Pas de déplacement des PODS entre Node :
+            - ajout d'un node n'entraine pas le réequilbrage
+                - reste vide jusqu'a ce que un ou des POD démarre
+
 
 -- Vagrant :
     - Infra as code pour déploiement de VM
@@ -51,19 +81,7 @@ source (Vagrantfile) : https://github.com/sciabarracom/Mosaico3/blob/master/serv
             - 2/ Enpos08 : 10.0.0.x/24 
                 - pluggué sur vswitch en bridge (réseau 'kube')
                 
-
-##### Kubectl reference ##### :
-    - lister les noeuds :
-        - kubectl get nodes
-        - kubectl get node node1
-        - kubectl get node/node2
-    - Activer l'autocomplétion :
-        - . <(kubectl completion bash)
-            - "." -> équivalent de la commande source
-            - ajoute le résultat de la commande a
-
 ##### Unix command ######### :
-
 -- Vagrant local repo :
     - vagrant box add ubuntu/xenial64 file:///home/ib/Téléchargements/virtualbox.box-aka_ubuntu_xenial64 
 -- Run bash script from string :

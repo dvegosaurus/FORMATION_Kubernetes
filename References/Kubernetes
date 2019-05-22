@@ -1,0 +1,38 @@
+##### Kubectl reference ##### :
+-- lister les noeuds :
+    - kubectl get nodes
+    - kubectl get node node1
+    - kubectl get node/node2
+    - filtrage :
+        - notmatch -> kubectl get nodes --selector beta.kubernetes.io/arch\!=amd64
+            - attention au '!' qui est spécial en bash donc on l'echappe avec '\'
+            - match -> get nodes --selector beta.kubernetes.io/arch=amd64
+-- Activer l'autocomplétion :
+    - . <(kubectl completion bash)
+    - "." -> équivalent de la commande source
+    - ajoute le résultat de la commande a
+-- run :
+    - kubectl run serveurweb --image=nginx:alpine
+    - crée un déploiement qui contient un pod et un replica
+        - kubectl get Pod
+        - kubectl get deployement
+        - kubectl get replicaset (ou kubectl get rs)
+        - la totale :
+            - kubectl get deploy,po,rs
+            - kubectl get all 
+            - kubectl get all -o wide
+                - '-o' pour le formatage (-o wide, -o json)
+
+#### communication "dans" un pod (ici page web nginx) :
+- kubectl get all -> pour trouver l'ip d'un POD
+- curl <IP du POD> ne peut pas marcher
+    - le réseau est interne au cluster donc 
+    - on passe en ssh via un node ou le master :
+        - ssh node1 curl 10.44.0.1
+
+#### augmenter le nombre de POD pour un déploiement :
+-- kubectl scale deploy/<nom du deployment> --replicas=5 
+    - frontend pour du docker donc :
+        - kubectl scale = docker run = docker pull + docker run
+    - permet de scale Up ou Down :
+        - scale deploy/serveurweb --replicas=3 
