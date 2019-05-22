@@ -1,0 +1,27 @@
+### Prérequis
+
+-- Considérations techniques :
+    - Linux sans SELinux (i.e. : Ubuntu mais pas Centos ou RedHat)
+    - Pas de SWAP
+    - Désactiver le firewall si possible :
+        - beaucoup de flux
+        - Debug probablement complexe
+-- Configuration Minimum :
+    - Master 2 Go / 2 coeur
+    - Nodes : 1 Go / 1 coeur
+
+#### installation
+-- manuelle :
+    - complexe
+
+-- minikube :
+    - version lite pour pratiquer a la maison
+    - limité a 1 noeud
+    - https://kubernetes.io/fr/docs/tutorials/hello-minikube/
+
+-- Plusieurs projet Github :
+    - mosaico3 : https://github.com/sciabarracom/Mosaico3/
+        - simple mais pas souple
+    - Kubespray : https://github.com/kubernetes-sigs/kubespray
+        - plus complexe que Mosaico3 mais plus souple
+        - permet de choisir les composants réseaux, les Nodes ...

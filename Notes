@@ -1,5 +1,8 @@
 ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
 
+-- Mosaico3 :
+    - attention : les versions Docker et Kubernetes ne sont pas figées
+
 -- Kubernetes : 
     - apport du HA a docker
     - capacité de déployer sur plusieurs machines
@@ -8,11 +11,15 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
         - attention : vérifier compatibilité Docker avec la version Kubernetes utilisé
         - les versions n'évoluent pas ensemble
     - daemon kubelet (géré par systemctl) :
-        - gère la communication dans le cluster
+        - gère la communication dans le cluster (1 service par noeud)
         - non dockerisable
     - Modulaire :
         - pour une partie des composants choix entre plusieurs produits 
         - i.e : couche réseau -> weave,calico,flanel
+    - Docker installé par Kubernetes (pour le fonctionnement Kubernetes)
+        - weave : réseau
+        - apiserver : api result
+            - kubectl est simplement un client pour apiserver
 
 -- Vagrant :
     - Infra as code pour déploiement de VM
@@ -45,7 +52,15 @@ source (Vagrantfile) : https://github.com/sciabarracom/Mosaico3/blob/master/serv
                 - pluggué sur vswitch en bridge (réseau 'kube')
                 
 
-
+##### Kubectl reference ##### :
+    - lister les noeuds :
+        - kubectl get nodes
+        - kubectl get node node1
+        - kubectl get node/node2
+    - Activer l'autocomplétion :
+        - . <(kubectl completion bash)
+            - "." -> équivalent de la commande source
+            - ajoute le résultat de la commande a
 
 ##### Unix command ######### :
 
@@ -60,4 +75,16 @@ source (Vagrantfile) : https://github.com/sciabarracom/Mosaico3/blob/master/serv
 -- run ansible playbook :
     - ansible-playbook site.yml 
 -- ssh example + kubeadm :
- - ssh node1 sudo kubeadm join --discovery-token-unsafe-skip-ca-verification --token=mjlcb2.obg2eiu17ux0e0z5 10.0.0.10:6443
+    - ssh node1 sudo kubeadm join --discovery-token-unsafe-skip-ca-verification --token=mjlcb2.obg2eiu17ux0e0z5 10.0.0.10:6443
+-- surveiller une commande :
+    - watch ssh master kubectl get nodes
+    - result :
+
+        Every 2,0s: ssh master kubectl get nodes             Wed May 22 11:47:18 2019
+
+        NAME     STATUS   ROLES    AGE     VERSION
+        master   Ready    master   44m     v1.14.2
+        node1    Ready    <none>   6m40s   v1.14.2
+        node2    Ready    <none>   5m30s   v1.14.2
+        node3    Ready    <none>   5m6s    v1.14.2
+
