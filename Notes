@@ -3,6 +3,16 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
 -- Kubernetes : 
     - apport du HA a docker
     - capacité de déployer sur plusieurs machines
+    - agnostique : ni dédié a ni maintenu par docker 
+    - totalement indépendant de docker
+        - attention : vérifier compatibilité Docker avec la version Kubernetes utilisé
+        - les versions n'évoluent pas ensemble
+    - daemon kubelet (géré par systemctl) :
+        - gère la communication dans le cluster
+        - non dockerisable
+    - Modulaire :
+        - pour une partie des composants choix entre plusieurs produits 
+        - i.e : couche réseau -> weave,calico,flanel
 
 -- Vagrant :
     - Infra as code pour déploiement de VM
@@ -15,6 +25,26 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
     - yum install ansible -> ajoute les docs plus un peu de conf
     - pip install ansible -> latest release garanti ou choix d'une ancienne version
         - pip installer python (ansible est codé en Python)
+
+-- redis,zookeeper,etcd :
+    - BDD spéciale : uniquement stockage de paire Key/Value
+    - rapide a écrire, rapide a lire
+    - redis vs zookeeper,etcd -> redis pas vraiment prévu pour de la clusterisation
+        - donc etcd pour clusteriser la conf Kubernetes (c.f. Haute Dispo)
+
+-- Infra de formation :
+source (Vagrantfile) : https://github.com/sciabarracom/Mosaico3/blob/master/servers/vbox/Vagrantfile
+
+    - Hote (Centos 7): accueille les VM
+        - heberge 4 VM ubuntu  16.04 (Oracle virtual Box)
+            - master,node1,node2,node3
+        - 2 cartes réseau par VM
+            - 1/ Enpos03 : 192.168.0.15/16 
+                - meme IP pour chaque VM, utilisé pour du NAT et sortir sur le web
+            - 2/ Enpos08 : 10.0.0.x/24 
+                - pluggué sur vswitch en bridge (réseau 'kube')
+                
+
 
 
 ##### Unix command ######### :
@@ -29,3 +59,5 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
     - pip install ansible==<version number>
 -- run ansible playbook :
     - ansible-playbook site.yml 
+-- ssh example + kubeadm :
+ - ssh node1 sudo kubeadm join --discovery-token-unsafe-skip-ca-verification --token=mjlcb2.obg2eiu17ux0e0z5 10.0.0.10:6443
