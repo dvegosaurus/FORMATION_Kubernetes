@@ -1,0 +1,9 @@
+-- docker :
+    - list
+    - run (pull + start)
+    - inspect
+
+-- kubeclt :
+    - get
+    - run
+    - describe

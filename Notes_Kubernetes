@@ -7,10 +7,11 @@
         - notmatch -> kubectl get nodes --selector beta.kubernetes.io/arch\!=amd64
             - attention au '!' qui est spécial en bash donc on l'echappe avec '\'
             - match -> get nodes --selector beta.kubernetes.io/arch=amd64
+        - i.e. = Kubectl get deploy,rs,po --show-labels --selector run==serveurweb
 -- Activer l'autocomplétion :
     - . <(kubectl completion bash)
     - "." -> équivalent de la commande source
-    - ajoute le résultat de la commande a
+    - ajoute le résultat de la commande a la source
 -- run :
     - kubectl run serveurweb --image=nginx:alpine
     - crée un déploiement qui contient un pod et un replica
@@ -36,3 +37,14 @@
         - kubectl scale = docker run = docker pull + docker run
     - permet de scale Up ou Down :
         - scale deploy/serveurweb --replicas=3 
+    - directement a la création du déploiement :
+        - kubectl run autreserveurweb --image=nginx:alpine --replicas=6
+
+#### Création a partir d'un fichier de conf :
+-- Validation du fichier :
+    - kubectl create -f <path to yaml>l --validate --dry-run 
+-- Creation : 
+    - kubectl create -f <path to yaml>
+
+
+

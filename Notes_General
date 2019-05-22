@@ -33,7 +33,7 @@ Service     : contient des déploiements
         - juste les docker fonctionnel (réseaux, api Kubernetes)
     - Un POD = 2 conteneur au minimun :
         - l'application (i.e. nginx)
-        - un docker "pilote"
+        - un docker "pilote" (heberge un process appelé "pause")
 
 -- Pods :
     - contient un ou des conteneurs docker
@@ -49,8 +49,11 @@ Service     : contient des déploiements
         - Pas de déplacement des PODS entre Node :
             - ajout d'un node n'entraine pas le réequilbrage
                 - reste vide jusqu'a ce que un ou des POD démarre
-
-
+-- Labels :
+    - peuvent etre utilisé 
+        - pour filtrer les resultat d'un Kubectl get
+        - pour restreindre des pods a certains nodes 
+ 
 -- Vagrant :
     - Infra as code pour déploiement de VM
 
