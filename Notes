@@ -7,8 +7,14 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
 -- Vagrant :
     - Infra as code pour déploiement de VM
 
-
-
+-- Ansible : 
+    - Attention package pas toujours a jours sur les repos officiel
+    - Ajouter le repos EPEL 
+        - Extra Packages for Enterprise Linux
+    - sudo yum install 
+    - yum install ansible -> ajoute les docs plus un peu de conf
+    - pip install ansible -> latest release garanti ou choix d'une ancienne version
+        - pip installer python (ansible est codé en Python)
 
 
 ##### Unix command ######### :
@@ -17,3 +23,9 @@ ref : https://github.com/sciabarracom/Mosaico3/tree/master/docs
     - vagrant box add ubuntu/xenial64 file:///home/ib/Téléchargements/virtualbox.box-aka_ubuntu_xenial64 
 -- Run bash script from string :
     - sudo bash -c "echo 127.0.0.1 master node1 node2 node3 >> /etc/hosts"
+-- Install EPEL Repos :
+    - sudo yum install epel-release
+-- pip install old release
+    - pip install ansible==<version number>
+-- run ansible playbook :
+    - ansible-playbook site.yml 
