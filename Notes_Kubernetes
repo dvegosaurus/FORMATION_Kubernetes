@@ -133,6 +133,10 @@ yaml ref. : https://github.com/dvegosaurus/FORMATION_Kubernetes/blob/master/Refe
     - kubectl label nodes <nodename> <label_name>-
         -delete (append '-' to the label_name)
 
+### creation de service :
+--
+    - kubectl expose deploy <nom du deploiemebt> --type=NodePort --name=<nom du service>
+    - 3 mode possibe : NodePort, loadbalancer et ???
 
 
 

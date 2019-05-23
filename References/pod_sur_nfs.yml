@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: webdp-nfs
+spec:
+ containers:
+ - name: web
+   image: nginx:alpine
+   volumeMounts:
+   - mountPath: /usr/share/nginx/html
+     name: fichierswebstatiques
+ volumes:
+ - name: fichierswebstatiques
+   persistentVolumeClaim:
+    claimName: demande-volumenfs
+  
