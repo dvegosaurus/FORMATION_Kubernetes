@@ -1,0 +1,61 @@
+-- Declaratif vs Imperatif
+    - Declaratif : on verifie si la condition est rempli :
+        - si oui : on fait rien
+        - si non on agit
+        - c'est idempotent
+    - Imperatif :
+        - on fait quoi qu'il arrive
+
+-- comme powershell :
+    - module officiel, communautaire
+    - a boire et a manger
+
+-- agentless !
+    - passe par :
+        - SSH
+        - WinRM
+        - Docker (protocole spécifique)
+
+-- écrit en python :
+    - les modules sont poussé vers les clients
+    - interpréteur Python p-e nécessaire sur les clients
+
+-- attention !
+    - Les modules dépendent de la version
+    - Du coup parfois ca casse quand on monte de version
+
+-- préferer l'install par pip (python)
+    - permet de choisir la version
+
+-- Modules :
+    - module facts -> collecte d'infos
+    - /usr/lib/python2.7/site-packages/ansible/modules
+    - comme DSC param mandatory et optionnal
+
+-- Inventaire :
+    - fichier qui liste les machines géré par ansible 
+        - IP ou Hostname
+
+#### commands :
+-- list module :
+    - ansible-doc -l | wc -l
+        - counte les modeles
+    - ansible-doc -l
+        - liste les modèles
+    - ansible-doc -l | grep facts
+
+-- ping :
+    - ansible -i 192.168.154.110 -m ping 192.168.154.110
+    - le -i permet de communiquer avec une machine hors inventaire
+    - tente une co ssh, permet de valider si le host est "pilotable"
+    - result :
+        ansible -i 192.168.145.167, -u orange -k -m ping 192.168.145.167
+        SSH password: 
+        192.168.145.167 | SUCCESS => {
+            "ansible_facts": {
+                "discovered_interpreter_python": "/usr/bin/python3"
+            }, 
+            "changed": false, 
+            "ping": "pong"
+        }
+
