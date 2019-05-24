@@ -108,6 +108,11 @@
     - yum list
     - yum grouplist
 
+-- ajouter une ip virtuelle :
+    - ip a add 172.31.10.25/16 dev enp03
+    - ip a add <ip/masque> dev <network card name>
+        - dev pour Device 
+
 
 
 

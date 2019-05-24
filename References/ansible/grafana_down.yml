@@ -1,0 +1,36 @@
+- name: "Mise en oeuvre TICK"
+  hosts:
+    - centosnfs
+  gather_facts: no
+  tasks:
+  - name: "Grafana Repository present"
+    yum_repository:
+      name: grafana
+      description: Grafana YUM repo
+      baseurl: https://packages.grafana.com/oss/rpm
+      repo_gpgcheck: 1
+      gpgcheck: 1
+      gpgkey: https://packages.grafana.com/gpg.key
+      sslverify: 1
+      sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+      state: absent
+  - name: "InfluxDB repository absent"
+    yum_repository:
+      name: InfluxDB
+      description: InfluxDB YUM repo
+      baseurl: https://repos.influxdata.com/rhel/7/x86_64/stable/
+      repo_gpgcheck: 1
+      gpgcheck: 1
+      gpgkey: https://repos.influxdata.com/influxdb.key
+      state: absent
+  - name: "grafana absent"
+    yum:
+      name: grafana
+      state: absent
+  - name: "firewall is open on 3000"
+    firewalld:
+      port: 3000/tcp
+      permanent: yes
+      immediate: yes
+      state: disabled
+

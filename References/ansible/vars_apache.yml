@@ -1,0 +1,7 @@
+web_sur: 
+  { 
+    RedHat: { paquet_service: httpd, identite: apache}, 
+    Debian: { paquet_service: apache2,identite: www-data},
+  }
+  # - nom_paquet_serveur_web_sur: { RedHat: httpd, Debian: apache2 }
+

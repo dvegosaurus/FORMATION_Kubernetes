@@ -1,0 +1,66 @@
+- name: "Mise en oeuvre Grafana"
+  hosts:
+    - centosnfs
+  gather_facts: no
+  tasks:
+  - name: "firewall is open on 3000"
+    firewalld:
+      port: 3000/tcp
+      permanent: yes
+      immediate: yes
+      state: enabled
+  - name: "firewall is open on 8086"
+    firewalld:
+      port: 8086/tcp
+      permanent: yes
+      immediate: yes
+      state: enabled
+  - name: "Download InfluxDB"
+    get_url:
+      url: https://dl.influxdata.com/influxdb/releases/influxdb-1.7.6.x86_64.rpm
+      dest: /etc/influxdb.rpm
+      mode: '0440'
+  - name: "InfluxDB is installed"
+    yum:
+      name: "/etc/influxdb.rpm"
+      state: present
+  - name: "InfluxDB is started"
+    systemd:
+      name: influxdb
+      state: started
+      enabled: yes
+  - name: "Create database"
+    influxdb_database:
+      database_name: "telegraf"
+    ignore_errors: yes
+  - name: "Grafana Repository present"
+    yum_repository:
+      name: grafana
+      description: Grafana YUM repo
+      baseurl: https://packages.grafana.com/oss/rpm
+      repo_gpgcheck: 1
+      gpgcheck: 1
+      gpgkey: https://packages.grafana.com/gpg.key
+      sslverify: 1
+      sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+  - name: "Add grafana"
+    yum:
+      name: grafana
+    ignore_errors: yes
+  - name: "Grafana is started"
+    systemd:
+      name: grafana-server
+      state: started
+      enabled: yes
+  - name: Create influxdb datasource
+    grafana_datasource:
+      name: "datasource-influxdb"
+      grafana_url: "http://localhost:3000"
+      grafana_user: "admin"
+      grafana_password: "admin"
+      org_id: "1"
+      ds_type: "influxdb"
+      ds_url: "http://localhost:8086"
+      database: "telegraf"
+      time_interval: ">10s"
+
