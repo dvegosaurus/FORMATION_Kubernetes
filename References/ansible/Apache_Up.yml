@@ -6,39 +6,52 @@
   vars_files:
    - vars_apache.yml
   gather_facts: yes
+  handlers:
+    - name: "reload apache config"
+      systemd: name={{web_sur[ansible_os_family]["paquet_service"]}} state=reloaded
   tasks:
   - debug: msg="C'est un {{ansible_all_ipv4_addresses}}"
   - debug: var=web_sur
     run_once: yes
   - debug: var=web_sur["Debian"]
     run_once: yes
-  - name: "Apache is present"
-    package:
-      # ansible -m setup -a 'filter=ansible_distri*'  all (gather)
-      name: '{{web_sur[ansible_os_family]["paquet_service"]}}' # [bracket -> key from gather_facts, penser Posh !]
-  - name: "s'assurer que le service apache est configuré"
-    systemd:
-      name: '{{web_sur[ansible_os_family]["paquet_service"]}}'
-      state: started
-      enabled: yes
-  - name: "s'assurer de la présence d'une page d'accueil personalisé (Debian)"
-    copy:
-      src: page_accueil.html
-      dest: /var/www/html/index.html
-# syntaxe variable + indexation dans un tableau (parenthese pour variable crée par nous)
-# basé sur le resultat du module setup (cf. gather_facts: yes )
-      owner: '{{web_sur[ansible_os_family]["identite"]}}' 
-      group: '{{web_sur[ansible_os_family]["identite"]}}' 
-      mode: "644"
-  - name: "s'assurer que le parefeu est configuré pour apache"
-    firewalld:
-      permanent: yes
-      immediate: yes
-      service: http
-      state: enabled
-    ignore_errors: yes
-    when: ansible_os_family == 'RedHat' 
-      and ansible_distribution_major_version|int >= 7
-      # and (int) ansible_distribution_major_version >= 7
+  - block:
+    - name: "Apache is present"
+      package: # ansible -m setup -a 'filter=ansible_distri*'  all (gather)
+        name: '{{web_sur[ansible_os_family]["paquet_service"]}}' # [bracket -> key from gather_facts, penser Posh !]
+    - name: "apache is running"
+      systemd:
+        name: '{{web_sur[ansible_os_family]["paquet_service"]}}'
+        state: started
+        enabled: yes
+      ignore_errors: no
+    - name: "index.html exist"
+      template:
+        src: page_accueil.html.j2
+        dest: /var/www/html/index.html
+        owner: '{{web_sur[ansible_os_family]["identite"]}}'  # basé sur le resultat du module setup (cf. gather_facts: yes )
+        group: '{{web_sur[ansible_os_family].identite}}'     # syntaxe variable + indexation dans un tableau (parenthese pour variable crée par nous)
+        mode: "644"
+        backup: yes
+      tags:
+        - accueil # Utilisation des tags
+    - name: "firewall is configured"
+      firewalld:
+        permanent: yes
+        immediate: yes
+        service: http
+        state: enabled
+      when: ansible_os_family == 'RedHat' 
+        and ansible_distribution_major_version|int >= 7
+        # and (int) ansible_distribution_major_version >= 7
+    - name:
+      lineinfile:
+        path: /etc/apache2/conf-available/security.conf
+        regexp: ^ServerTok
+        line: ServerTokens Prod
+      notify: "reload apache config"
+      tags:
+        - secureserver # permet de n'executer que les taches taggués (ansible-playbook --tags)
+    when: ansible_system == 'Linux'
 
 

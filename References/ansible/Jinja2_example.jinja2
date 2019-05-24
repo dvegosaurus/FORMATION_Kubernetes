@@ -1,0 +1,8 @@
+
+{% for adresse in ansible_all_ipv4_addresses|sort(reverse=true)  %}
+   {{numero.ligne}} - {{adresse}}<br>
+   {% set numero.ligne = numero.ligne + 1 %}
+{% endfor %}
+
+
+{% set numero = namespace(ligne=0) %}{% for adresse in ansible_all_ipv4_addresses|sort(reverse=true)  %}{{numero.ligne}} - {{adresse}}<br>{% set numero.ligne = numero.ligne + 1 %}{% endfor %}

@@ -90,6 +90,15 @@
     - par fichier :
         - ansible-playbook Apache_Up.yml --limit @<fichier>
 
+-- Utilisation des tags :
+    - a déclarer au préalable dans un playbook
+    - ansible-playbook Apache_Up.yml --skip-tags accueil
+    - ansible-playbook Apache_Up.yml --tags accueil
+    - ansible-playbook <nom du playbook> --skip-tags <nom du tag>
+
+-- Module Lineinfile
+ - ansible -m lineinfile -a "path=/etc/apache2/conf-available/security.conf regexp=^=ServerTok line='ServerTokens Prod'" ubu*
+
 #### Unix Divers :
 -- configurer le sudo sans MdP 
     - creer un fichier dans /etc/sudoers.d 
@@ -114,6 +123,14 @@
         - dev pour Device 
 
 
+##### Jinja2
+
+ {% for adresse in ansible_all_ipv4_addresses|sort(reverse=true)  %}
+ {{adresse}}<br>
+ {% endfor %} 
+
+-- "|" -> envoie vers (cf. Posh, bash)
+-- sort() -> fonction
 
 
 
