@@ -37,6 +37,8 @@
     - fichier qui liste les machines géré par ansible 
         - IP ou Hostname
 
+-- Utilise Jinja2
+
 #### commands :
 -- list module :
     - ansible-doc -l | wc -l
@@ -76,6 +78,17 @@
         |  |  |--{ansible_host = 192.168.145.110}
         |  |  |--{ansible_user = orange}
 
+-- gather facts :
+    - configurable dans un playbook
+    - utilise le module setup
+    - Ansible -m setup -a 'filter=ansible_os_fa*'  all
+    - Ansible -m setup | grep ansible_os
+
+-- limiter les cibles:
+    - par nom de machine :
+        - ansible-playbook Apache_Up.yml --limit centosmin
+    - par fichier :
+        - ansible-playbook Apache_Up.yml --limit @<fichier>
 
 #### Unix Divers :
 -- configurer le sudo sans MdP 
@@ -85,6 +98,21 @@
 -- push ssh key :
     - ssh-copy-id <user>@<ip>
     - ssh-copy-id root@192.168.145.200
+
+-- variable temporaire :
+    - <variable>=<value> <commande>
+    - LANG=en man ls
+    - DISPLAY_SKIPPED_HOSTS=false ansible-playbook Apache_Down.yml 
+
+-- yum :
+    - yum list
+    - yum grouplist
+
+
+
+
+
+
 
 
 
