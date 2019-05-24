@@ -1,0 +1,21 @@
+tout:
+  hosts:
+  children:
+    ubuntu:
+      hosts:
+        ubudesk:
+         ansible_host: 192.168.145.190
+         ansible_user: ansible
+         ansible_become: true
+        ubuserver:
+         ansible_host: 192.168.145.167
+         ansible_user: ansible
+         ansible_become: true
+    centos:
+      hosts:
+       centosmin:
+        ansible_host: 192.168.145.110
+        ansible_user: root
+       centosnfs:
+        ansible_host: 192.168.145.200
+        ansible_user: root

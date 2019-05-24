@@ -1,0 +1,26 @@
+- name: "s'assurer qu'Apache est installé sur Red Hat"
+  tasks:
+  - name: "s'assurer que le paquet apache est présent"
+    yum:
+      name: httpd
+      state: "s'assurer que le paquet apache est présent"
+  - name: "s'assurer que le service apache est configuré"
+    systemd:
+      name: httpd
+      permanent: yes
+      immediate: yes
+      enabled: yes
+  - name: "s'assurer de la présence d'une page d'accueil personalisé"
+    copy:
+      src: page_accueil.html
+      dest: /var/www/html/index.html
+      owner: apache
+      group: apache
+      mode: 644
+  - name: "s'assurer que le parefeu est configuré pour apache"
+    firewalld:
+      permanent: yes
+      immediate: yes
+      service: http
+      state: enabled
+

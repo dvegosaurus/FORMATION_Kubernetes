@@ -63,18 +63,28 @@
 -- voir l'inventaire :
     -- ansible-inventory --graph --vars
         - results :
-            @all:
-            |--@ubuntu:
-            |  |--ubudesk
-            |  |  |--{ansible_host = 192.168.145.190}
-            |  |  |--{ansible_user = orange}
-            |  |--ubuserver
-            |  |  |--{ansible_host = 192.168.145.167}
-            |  |  |--{ansible_user = orange}
-            |--@ungrouped:
-            |  |--centosmin
-            |  |  |--{ansible_host = 192.168.145.110}
-            |  |  |--{ansible_user = orange}
+        @all:
+        |--@ubuntu:
+        |  |--ubudesk
+        |  |  |--{ansible_host = 192.168.145.190}
+        |  |  |--{ansible_user = orange}
+        |  |--ubuserver
+        |  |  |--{ansible_host = 192.168.145.167}
+        |  |  |--{ansible_user = orange}
+        |--@ungrouped:
+        |  |--centosmin
+        |  |  |--{ansible_host = 192.168.145.110}
+        |  |  |--{ansible_user = orange}
+
+
+#### Unix Divers :
+-- configurer le sudo sans MdP 
+    - creer un fichier dans /etc/sudoers.d 
+    - ajouter la conf (prendre en reference /etc/sudoers)
+        - <username> ALL=(ALL:ALL) NOPASSWD: ALL
+-- push ssh key :
+    - ssh-copy-id <user>@<ip>
+    - ssh-copy-id root@192.168.145.200
 
 
 
