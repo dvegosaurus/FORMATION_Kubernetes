@@ -15,6 +15,7 @@
         - SSH
         - WinRM
         - Docker (protocole spécifique)
+    - la conf doit donc etre faite sur les client (c.f. WinRM quickconfig)
 
 -- écrit en python :
     - les modules sont poussé vers les clients
@@ -58,4 +59,22 @@
             "changed": false, 
             "ping": "pong"
         }
+
+-- voir l'inventaire :
+    -- ansible-inventory --graph --vars
+        - results :
+            @all:
+            |--@ubuntu:
+            |  |--ubudesk
+            |  |  |--{ansible_host = 192.168.145.190}
+            |  |  |--{ansible_user = orange}
+            |  |--ubuserver
+            |  |  |--{ansible_host = 192.168.145.167}
+            |  |  |--{ansible_user = orange}
+            |--@ungrouped:
+            |  |--centosmin
+            |  |  |--{ansible_host = 192.168.145.110}
+            |  |  |--{ansible_user = orange}
+
+
 
