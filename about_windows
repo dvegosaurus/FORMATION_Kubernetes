@@ -1,0 +1,13 @@
+-- Add the pythin module for winrm :
+  - pip install "pywinrm>=0.3.0"
+-- host file options :
+  - Workgroup :
+      ansible_user: LocalUsername
+      ansible_password: Password
+      ansible_connection: winrm
+      ansible_winrm_transport: ntlm
+  - Domain :
+      ansible_user: username@MY.DOMAIN.COM
+      ansible_password: Password
+      ansible_connection: winrm
+      ansible_winrm_transport: kerberos
