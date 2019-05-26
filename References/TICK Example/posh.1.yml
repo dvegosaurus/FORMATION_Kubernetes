@@ -1,0 +1,106 @@
+
+- name: "Mise en oeuvre Grafana"
+  vars_files:
+   - conf.yaml
+  hosts:
+    - all
+  gather_facts: yes
+  tasks:
+  - name: "firewall is open on 3000"
+    firewalld:
+      port: 3000/tcp
+      permanent: yes
+      immediate: yes
+      state: enabled
+  - name: "firewall is open on 8086"
+    firewalld:
+      port: 8086/tcp
+      permanent: yes
+      immediate: yes
+      state: enabled
+  - name: "Download InfluxDB"
+    get_url:
+      url: https://dl.influxdata.com/influxdb/releases/influxdb-1.7.6.x86_64.rpm
+      dest: /etc/influxdb.rpm
+      mode: '0440'
+  - name: "InfluxDB is installed"
+    yum:
+      name: "/etc/influxdb.rpm"
+      state: present
+  - name: "InfluxDB is started"
+    systemd:
+      name: influxdb
+      state: started
+      enabled: yes
+  - name: "create database"
+    command: /bin/influx -execute 'create database telegraf'
+  - name: "Grafana Repository present"
+    yum_repository:
+      name: grafana
+      description: Grafana YUM repo
+      baseurl: https://packages.grafana.com/oss/rpm
+      repo_gpgcheck: 1
+      gpgcheck: 1
+      gpgkey: https://packages.grafana.com/gpg.key
+      sslverify: 1
+      sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+  - name: "Add grafana"
+    yum:
+      name: grafana
+    ignore_errors: yes
+  - name: "Grafana is started"
+    systemd:
+      name: grafana-server
+      state: started
+      enabled: yes
+  - name: Create influxdb datasource
+    grafana_datasource:
+      name: "datasource-influxdb"
+      grafana_url: "http://localhost:3000"
+      grafana_user: "admin"
+      grafana_password: "admin"
+      org_id: "1"
+      ds_type: "influxdb"
+      ds_url: "http://localhost:8086"
+      database: "telegraf"
+      time_interval: ">10s"
+  - name: "Download the package for Centos"
+    get_url:
+      url: http://dl.influxdata.com/telegraf/releases/telegraf-{{ telegraf_agent_version }}.x86_64.rpm
+      dest: /tmp/telegraf-{{ telegraf_agent_version }}.x86_64.rpm
+    when: ansible_os_family == "RedHat"
+    tags:
+      - telegraf
+
+  - name: Install the package for Centos
+    command: yum localinstall -y /tmp/telegraf-{{ telegraf_agent_version }}.x86_64.rpm
+    changed_when: False
+    when: ansible_os_family == "RedHat"
+    tags:
+      - telegraf
+
+  - name: Install sysstat for Centos
+    yum:
+      name: sysstat
+      state: present
+    when: ansible_os_family == "RedHat"
+    tags:
+      - telegraf
+
+  - name: Copy the template
+    template:
+      src: telegraf.conf.j2
+      dest: /etc/telegraf/telegraf.conf
+      owner: telegraf
+      group: telegraf
+      mode: 0644
+    tags:
+      - telegraf
+
+  - name: start telegraf
+    systemd:
+      name: telegraf
+      state: started
+      enabled: yes
+    tags:
+      - telegraf
