@@ -1,0 +1,170 @@
+- name: "TICK Installation (small mode)"
+  hosts:
+    - centos_desktop
+  gather_facts: no
+  tasks:
+# configure firewalld
+  - name: "firewalld is started"
+    systemd:
+      name: firewalld
+      state: started
+      enabled: yes
+    ignore_errors: yes
+  - name: "firewalld : configure ports"
+    firewalld:
+      port: '{{ item }}'
+      permanent: yes
+      immediate: yes
+      state: enabled
+    ignore_errors: yes
+    loop:
+     - 3000/tcp
+     - 8086/tcp
+# configure repository 
+  - name: "Add influxDB repository"
+    yum_repository:
+      name: influxdb.repo
+      description: InfluxDB Repository - RHEL \$releasever
+      baseurl: https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable
+      repo_gpgcheck: 0
+      gpgcheck: 1
+      gpgkey: https://repos.influxdata.com/influxdb.key
+      sslverify: 1
+      sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+  - name: "Add Grafana repository"
+    yum_repository:
+      name: grafana
+      description: Grafana YUM repo
+      baseurl: https://packages.grafana.com/oss/rpm
+      repo_gpgcheck: 1
+      gpgcheck: 1
+      gpgkey: https://packages.grafana.com/gpg.key
+      sslverify: 1
+      sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+# install application 
+  - name: "install application (yum)"
+    yum:
+      name: '{{ item }}'
+      state: latest
+    ignore_errors: yes
+    loop: 
+      - grafana
+      - influxdb
+      - telegraf
+  - name: Install pip for InfluxDB  (needed for IndfluxDB database management)
+    pip:
+      name: influxdb
+# configure services
+  - name: "Enable and start services"
+    systemd:
+      name: '{{ item }}'
+      state: started
+      enabled: yes
+    loop:
+      - grafana-server
+      - influxdb
+      - telegraf
+# configure application
+  - name: "Create database"
+    influxdb_database:
+      database_name: '{{ item }}'
+    loop:
+      - telegraf_linux
+      - telegraf_server
+      - test 
+      - telegraf_workstation
+      - citrix_xendesktop
+      - citrix_xenapp
+      - centreon 
+  - name: configure retention policies (1d)
+    influxdb_retention_policy:
+      hostname: localhost
+      database_name: '{{ item }}'
+      policy_name: 1d
+      duration: 1d
+      replication: 1
+      default: yes
+    loop:
+      - test
+  - name: configure retention policies (7d)
+    influxdb_retention_policy:
+      hostname: localhost
+      database_name: '{{ item }}'
+      policy_name: 7d
+      duration: 7d
+      replication: 1
+      default: yes
+    loop:
+      - telegraf_linux
+      - telegraf_server
+      - telegraf_workstation
+  - name: configure retention policies (30d)
+    influxdb_retention_policy:
+      hostname: localhost
+      database_name: '{{ item }}'
+      policy_name: 30d
+      duration: 30d
+      replication: 1
+      default: yes
+    loop:
+      - citrix_xendesktop
+      - citrix_xenapp
+      - centreon
+  - name: Create influxdb datasource
+    tags: datasource
+    grafana_datasource:
+      name: '{{ item }}'
+      grafana_url: "http://localhost:3000"
+      grafana_user: "admin"
+      grafana_password: "admin"
+      org_id: "1"
+      ds_type: "influxdb"
+      ds_url: "http://localhost:8086"
+      database: '{{ item }}'
+      time_interval: ">10s"
+      state: present
+      is_default : no
+      tls_skip_verify: true
+    loop:
+      - telegraf_linux
+      - telegraf_server
+      - test 
+      - telegraf_workstation
+      - citrix_xendesktop
+      - citrix_xenapp
+      - centreon
+  - name: Install Grafana plugins
+    tags: plugins
+    grafana_plugin: 
+      name: '{{ item }}'
+      state: present
+    loop:
+      - grafana-worldmap-panel
+      - agenty-flowcharting-panel
+      - natel-influx-admin-panel
+      - grafana-clock-panel
+  - name: "Restart Grafana"
+    tags: restart
+    systemd:
+      name: grafana-server
+      state: restarted
+      daemon_reload: yes
+  - name: Remove Grafana plugins
+    tags: plugins
+    ignore_errors: yes
+    grafana_plugin: 
+      name: '{{ item }}'
+      state: absent
+    loop:
+      - digiapulssi-organisations-panel
+      
+# Restart services
+  - name: "Restart Grafana"
+    tags: restart
+    systemd:
+      name: '{{ item }}'
+      state: restarted
+      daemon_reload: yes
+    loop:
+      - telegraf
+      - grafana-server
